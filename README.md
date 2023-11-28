@@ -1,4 +1,4 @@
-# Anotações sobre Docker
+   # Anotações sobre Docker
 
 ## basics
 
@@ -71,3 +71,10 @@ docker push lpxsbr/nginx-aula:latest
 
 Manifesto de todos os containers pra rodar
 
+##
+
+History
+
+```
+lpxsbr/nginx-pomodoro:latest
+```
