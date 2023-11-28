@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <title>Relogio analógico - Docker</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: DotGothic16;
+        }
+
+        body {
+            height: 100vh;
+        }
+
+        .main {
+            height: 100%;
+            width: 100%;
+            background-color: antiquewhite;
+            padding: 10px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+
+        .clock {
+            width: 300px;
+            height: 220px;
+            background-color: rgb(34, 34, 34);
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+
+        .clock-inside {
+            border-radius: 10px;
+            width: 100%;
+            height: 70%;
+            background-color: rgb(28, 209, 28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clock-buttons {
+            padding: 5px;
+            display: flex;
+            width: 100%;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+
+        .clock-buttons>button {
+            height: 60px;
+            width: 100px;
+        }
+
+        .clock-buttons .input-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 80px;
+            height: 60px;
+        }
+
+        .clock-buttons .input-item label {
+            color: #fff;
+        }
+
+        .promotion h1 {
+            font-size: small;
+        }
+
+        @media (max-width: 470px) {
+            .main {
+                flex-direction: column;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="main">
+        <div class="clock">
+            <div class="clock-inside">
+                <h1 id="hour">00</h1>
+                <span>:</span>
+                <h1 id="minute">00</h1>
+                <span>:</span>
+                <h1 id="second">00</h1>
+            </div>
+            <div class="clock-buttons">
+                <button onclick="startPomodoro()">Start Pomodoro</button>
+                <button onclick="cancelPomodoro()">Cancel Pomodoro</button>
+                <div class="input-item">
+                    <label for="time">Ciclo</label>
+                    <input type="number" name="time" id="cicle">
+                </div>
+                <div class="input-item">
+                    <label for="time">Descanso</label>
+                    <input type="number" name="time" id="rest">
+                </div>
+            </div>
+        </div>
+        <div class="promotion">
+            <h1>Feito com o 💜 por Anselmo Lopes</h1>
+        </div>
+    </main>
+</body>
+<script>
+
+    if (!(localStorage.getItem('isPomodoro'))) {
+        window.localStorage.setItem('isPomodoro', '')
+    }
+
+    const dHour = document.getElementById('hour')
+    const dMinute = document.getElementById('minute')
+    const dSecond = document.getElementById('second')
+
+    setInterval(() => {
+        const d = new Date;
+        let h = d.getHours() < 10 ? '0' + d.getHours() : d.getHours()
+        let m = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()
+        let s = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds()
+        dHour.innerText = h
+        dMinute.innerText = m
+        dSecond.innerText = s
+        if (window.localStorage.getItem('isPomodoro') == 'true' && `${h}:${m}:${s}` == JSON.parse(window.localStorage.pomodoroTime).nextTime) {
+            window.alert('bateu')
+            // console.log(JSON.parse(window.localStorage.pomodoroTime).nextTime)
+            startPomodoro()
+        }
+    }, 1000)
+
+    const timeConfig = (minutes) => {
+        const d = new Date;
+        let h = d.getHours() < 10 ? '0' + d.getHours() : d.getHours()
+        let m = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()
+        let s = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds()
+        dHour.innerText = h
+        dMinute.innerText = m
+        dSecond.innerText = s
+
+        if((Number(m) + Number(minutes)) > 59){
+            // console.log(m)
+            h++
+            m = 60 - Number(m) - Number(minutes)
+        }else{
+            m = Number(m) + Number(minutes)
+        }
+
+        return `${h}:${m}:${s}`
+
+    }
+    const startPomodoro = () => {
+
+        const d = new Date;
+        let h = d.getHours() < 10 ? '0' + d.getHours() : d.getHours()
+        let m = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes()
+        let s = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds()
+        dHour.innerText = h
+        dMinute.innerText = m
+        dSecond.innerText = s
+
+        window.localStorage.setItem('isPomodoro', 'true')
+        window.localStorage.setItem('pomodoroTime', JSON.stringify(
+            {
+                cicle: JSON.parse(window.localStorage.pomodoroTime).cicle ?? document.getElementById('cicle').value,
+                startTime: `${h}:${m}:${s}`,
+                nextTime: timeConfig(document.getElementById('cicle').value)
+            }
+        ))
+        // window.location.reload()
+    }
+
+    const cancelPomodoro = () => {
+        window.localStorage.setItem('isPomodoro', 'false')
+        window.location.reload()
+    }
+
+</script>
+
+</html>
